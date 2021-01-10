@@ -1,10 +1,9 @@
 #include "pch.h"
 
-#include "pch.h"
-#include <GLAD/glad.h>
-#include <GLFW/glfw3.h>
+using namespace Core;
 
 int main()
 {
+	Log::Init();
 	return 0;
 }
