@@ -32,7 +32,7 @@ project "GaussianBlurFilter"
 	objdir ("%{wks.location}/bin-int/" ..outputdir .. "/%{prj.name}")
 
 	pchheader "pch.h"
-	pchsource "Core/pch.cpp"
+	pchsource "src/pch.cpp"
 
 	files
 	{
@@ -44,7 +44,10 @@ project "GaussianBlurFilter"
 
 		"UI/**.h",
 		"UI/**.cpp",
-		
+
+		"src/**.h",
+		"src/**.cpp",
+
 		"vendor/glm/glm/**.hpp",
 		"vendor/glm/glm/**.inl",
 
@@ -60,7 +63,9 @@ project "GaussianBlurFilter"
 
 	includedirs
 	{
+		"src",
 		"vendor",
+		"%{wks.location}",
 		"%{wks.location}/vendor/GLFW/include",
 		"%{wks.location}/vendor/Glad/include",
 		"%{wks.location}/vendor/glm",

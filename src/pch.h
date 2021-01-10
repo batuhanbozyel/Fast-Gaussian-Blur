@@ -6,10 +6,6 @@
 #include <algorithm>
 #include <functional>
 
-#include <thread>
-#include <atomic>
-#include <future>
-
 #include <string>
 #include <sstream>
 #include <iomanip>
@@ -18,7 +14,6 @@
 #include <queue>
 #include <list>
 #include <tuple>
-#include <variant>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -27,4 +22,15 @@
 
 #ifdef _WIN32
 #include <Windows.h>
+#endif
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include "Core/Log.h"
+
+#ifdef PDEBUG
+#define LOG_ASSERT(x, ...) { if(!(x)) { ::Core::Log::Error("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+#else
+#define LOG_ASSERT(x, ...)
 #endif
