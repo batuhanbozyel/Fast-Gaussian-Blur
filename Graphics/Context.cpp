@@ -13,6 +13,9 @@ namespace Graphics
 		const char* message,
 		const void* userParam)
 	{
+#ifdef PDEBUG
+		__debugbreak();
+#endif
 		switch (severity)
 		{
 			case GL_DEBUG_SEVERITY_HIGH:			Core::Log::Critical(message); return;
