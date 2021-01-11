@@ -28,6 +28,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Core/Log.h"
+#include "Core/WindowEvent.h"
 
 #ifdef PDEBUG
 #define LOG_ASSERT(x, ...) { if(!(x)) { ::Core::Log::Error("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
