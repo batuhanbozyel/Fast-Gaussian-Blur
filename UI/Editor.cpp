@@ -16,36 +16,6 @@
 #include <examples/imgui_impl_opengl3.h>
 #include <examples/imgui_impl_glfw.h>
 
-using namespace std::string_view_literals;
-
-static constexpr std::basic_string_view GaussianBlurVertexShader = R"(
-#version 450 core
-		
-layout(location = 0) out vec2 v_TexCoord;
-
-void main() 
-{
-    float x = float(((uint(gl_VertexID) + 2u) / 3u)%2u); 
-    float y = float(((uint(gl_VertexID) + 1u) / 3u)%2u); 
-
-    gl_Position = vec4(-1.0f + x*2.0f, -1.0f+y*2.0f, 0.0f, 1.0f);
-    v_TexCoord = vec2(x, y);
-})"sv;
-
-static constexpr std::basic_string_view GaussianBlurFragmentShader = R"(
-#version 450 core
-
-layout(location = 0) out vec4 color;
-
-layout(location = 0) in vec2 v_TexCoord;
-
-uniform sampler2D u_Texture;
-
-void main()
-{
-	color = texture(u_Texture, v_TexCoord);
-})"sv;
-
 namespace PEditor
 {
 	Editor* Editor::s_Instance = nullptr;
@@ -58,10 +28,7 @@ namespace PEditor
 
 	void Editor::OnStart()
 	{
-		s_Data.GaussianBlur = Graphics::ShaderLibrary::LoadShader(
-			"GaussianBlur",
-			std::string(GaussianBlurVertexShader),
-			std::string(GaussianBlurFragmentShader));
+		s_Data.GaussianBlur = Graphics::ShaderLibrary::LoadShader("GaussianBlur13x13.glsl");
 		
 		s_Data.Texture = Graphics::TextureLibrary::DefaultTexture();
 	}

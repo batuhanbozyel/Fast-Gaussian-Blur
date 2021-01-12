@@ -1,6 +1,7 @@
 #include "pch.h"
 #include <glad/glad.h>
 #include "Shader.h"
+#include <fstream>
 
 namespace Graphics
 {
@@ -156,7 +157,8 @@ namespace Graphics
 			glDeleteShader(vertexShader);
 
 			// Vertex shader compilation failed
-			LOG_ASSERT(false, "Vertex Shader complation failed: {0}", infoLog.data());
+			Core::Log::Error("Vertex Shader complation failed: {0}", infoLog.data());
+			LOG_ASSERT(false);
 			return;
 		}
 
@@ -187,7 +189,8 @@ namespace Graphics
 			glDeleteShader(vertexShader);
 
 			// Fragment shader compilation failed
-			LOG_ASSERT(false, "Fragment Shader compilation failed: {0}", infoLog.data());
+			Core::Log::Error("Fragment Shader compilation failed: {0}", infoLog.data());
+			LOG_ASSERT(false);
 			return;
 		}
 
@@ -222,7 +225,8 @@ namespace Graphics
 			glDeleteShader(fragmentShader);
 
 			// Shader linking failed
-			LOG_ASSERT(false, "Shader Linking failed: {0}", infoLog.data());
+			Core::Log::Error("Shader Linking failed: {0}", infoLog.data());
+			LOG_ASSERT(false);
 			return;
 		}
 
@@ -231,7 +235,66 @@ namespace Graphics
 		glDetachShader(m_ShaderHandle, fragmentShader);
 	}
 
-	std::unordered_map<uint32_t, std::string> Shader::ParseShaderSource(const std::string& source)
+	// ShaderLibrary for Shader caching
+
+	ShaderLibrary* ShaderLibrary::s_Instance = nullptr;
+
+	void ShaderLibrary::Init()
+	{
+		if (!s_Instance)
+			s_Instance = new ShaderLibrary;
+	}
+
+	const std::shared_ptr<Shader>& ShaderLibrary::LoadShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
+	{
+		const auto& shaderCacheIt = s_Instance->m_ShaderCache.find(name);
+
+		if (shaderCacheIt != s_Instance->m_ShaderCache.end())
+			return shaderCacheIt->second;
+
+		const auto& insertedShaderIt = s_Instance->m_ShaderCache.insert(
+			shaderCacheIt,
+			std::make_pair(name, std::make_shared<Shader>(vertexSrc, fragmentSrc)));
+
+		return insertedShaderIt->second;
+	}
+
+	const std::shared_ptr<Shader>& ShaderLibrary::LoadShader(const std::string& sourcePath)
+	{
+		std::string shaderSource = ReadFile(sourcePath);
+		auto parsedSources = ParseShaderSource(shaderSource);
+		return LoadShader(sourcePath, parsedSources[GL_VERTEX_SHADER], parsedSources[GL_FRAGMENT_SHADER]);
+	}
+
+	std::string ShaderLibrary::ReadFile(const std::string& sourcePath)
+	{
+		std::string source;
+		std::ifstream shaderFile(sourcePath, std::ios::in | std::ios::binary);
+		if (shaderFile)
+		{
+			shaderFile.seekg(0, std::ios::end);
+			size_t size = shaderFile.tellg();
+			if (size != -1)
+			{
+				source.resize(size);
+				shaderFile.seekg(0, std::ios::beg);
+				shaderFile.read(&source[0], size);
+				shaderFile.close();
+			}
+			else
+			{
+				LOG_ASSERT(false, "Could not read from file!");
+			}
+		}
+		else
+		{
+			// Could not open file
+			LOG_ASSERT(false, "Could not open file!");
+		}
+		return source;
+	}
+
+	std::unordered_map<uint32_t, std::string> ShaderLibrary::ParseShaderSource(const std::string& source)
 	{
 		auto ShaderType = [](const std::string& type)
 		{
@@ -265,29 +328,5 @@ namespace Graphics
 			begin = end;
 		}
 		return shaderSources;
-	}
-
-	// ShaderLibrary for Shader caching
-
-	ShaderLibrary* ShaderLibrary::s_Instance = nullptr;
-
-	void ShaderLibrary::Init()
-	{
-		if (!s_Instance)
-			s_Instance = new ShaderLibrary;
-	}
-
-	const std::shared_ptr<Shader>& ShaderLibrary::LoadShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
-	{
-		const auto& shaderCacheIt = s_Instance->m_ShaderCache.find(name);
-
-		if (shaderCacheIt != s_Instance->m_ShaderCache.end())
-			return shaderCacheIt->second;
-
-		const auto& insertedShaderIt = s_Instance->m_ShaderCache.insert(
-			shaderCacheIt,
-			std::make_pair(name, std::make_shared<Shader>(vertexSrc, fragmentSrc)));
-
-		return insertedShaderIt->second;
 	}
 }

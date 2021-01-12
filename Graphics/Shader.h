@@ -42,7 +42,6 @@ namespace Graphics
 		void CalculateUniformLocations();
 		uint32_t GetUniformLocation(const char* name) const;
 		void Compile(const std::string& vertexSrc, const std::string& fragmentSrc);
-		std::unordered_map<uint32_t, std::string> ParseShaderSource(const std::string& source);
 	private:
 		GLuint m_ShaderHandle;
 		std::unordered_map<std::string, uint32_t> m_UniformCache;
@@ -54,6 +53,7 @@ namespace Graphics
 		static void Init();
 		~ShaderLibrary() = default;
 
+		static const std::shared_ptr<Shader>& LoadShader(const std::string& sourcePath);
 		static const std::shared_ptr<Shader>& LoadShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
 
 		static const std::shared_ptr<Shader>& GetShader(const std::string& name)
@@ -67,6 +67,8 @@ namespace Graphics
 		ShaderLibrary& operator=(const ShaderLibrary&) = delete;
 	private:
 		ShaderLibrary() = default;
+		static std::string ReadFile(const std::string& sourcePath);
+		static std::unordered_map<uint32_t, std::string> ParseShaderSource(const std::string& source);
 	private:
 		std::unordered_map<std::string, std::shared_ptr<Shader>> m_ShaderCache;
 
