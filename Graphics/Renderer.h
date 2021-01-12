@@ -11,6 +11,7 @@ namespace Graphics
 		static void Init();
 		static void Shutdown();
 
-		static void DrawTextureFiltered(const Texture2D* texture, const Shader* filterPass);
+		static GLuint DrawTextureFiltered(const Texture2D* texture, const Shader* filterPass);
+		static void ResizeTextureFramebuffer(uint32_t width, uint32_t height);
 	};
 }
