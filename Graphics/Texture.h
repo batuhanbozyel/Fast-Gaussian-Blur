@@ -2,18 +2,15 @@
 
 namespace Graphics
 {
-	class Texture2D
+	struct Texture2D
 	{
 	public:
+		GLuint TextureID;
+		int Width = 1, Height = 1, Channels = 1;
+
 		Texture2D();
 		Texture2D(const std::string filePath);
 		~Texture2D();
-
-		void Bind(uint32_t slot) const;
-
-		operator GLuint() const { return m_TextureID; }
-	private:
-		GLuint m_TextureID;
 	};
 
 	class TextureLibrary

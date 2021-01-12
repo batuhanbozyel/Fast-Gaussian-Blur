@@ -10,49 +10,43 @@ namespace Graphics
 
 	Texture2D::Texture2D()
 	{
-		glCreateTextures(GL_TEXTURE_2D, 1, &m_TextureID);
+		glCreateTextures(GL_TEXTURE_2D, 1, &TextureID);
 
 		unsigned char buffer[4] = { 25, 25, 25, 255 };
-		glTextureParameteri(m_TextureID, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTextureParameteri(m_TextureID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTextureParameteri(TextureID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTextureParameteri(TextureID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		glTextureParameteri(m_TextureID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTextureParameteri(m_TextureID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(TextureID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTextureParameteri(TextureID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-		glTextureStorage2D(m_TextureID, 1, GL_RGBA8, 1, 1);
-		glTextureSubImage2D(m_TextureID, 0, 0, 0, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+		glTextureStorage2D(TextureID, 1, GL_RGBA8, 1, 1);
+		glTextureSubImage2D(TextureID, 0, 0, 0, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 	}
 
 	Texture2D::Texture2D(const std::string filePath)
 	{
 		stbi_set_flip_vertically_on_load(1);
 
-		glCreateTextures(GL_TEXTURE_2D, 1, &m_TextureID);
+		glCreateTextures(GL_TEXTURE_2D, 1, &TextureID);
 
-		int width, height, channels;
-		unsigned char* buffer = stbi_load(filePath.c_str(), &width, &height, &channels, 4);
+		unsigned char* buffer = stbi_load(filePath.c_str(), &Width, &Height, &Channels, 4);
 		if (buffer)
 		{
-			glTextureParameteri(m_TextureID, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTextureParameteri(m_TextureID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTextureParameteri(TextureID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTextureParameteri(TextureID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-			glTextureParameteri(m_TextureID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTextureParameteri(m_TextureID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTextureParameteri(TextureID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTextureParameteri(TextureID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-			glTextureStorage2D(m_TextureID, 1, GL_RGBA8, width, height);
-			glTextureSubImage2D(m_TextureID, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+			glTextureStorage2D(TextureID, 1, GL_RGBA8, Width, Height);
+			glTextureSubImage2D(TextureID, 0, 0, 0, Width, Height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 		}
 		stbi_image_free(buffer);
 	}
 	
 	Texture2D::~Texture2D()
 	{
-		glDeleteTextures(1, &m_TextureID);
-	}
-
-	void Texture2D::Bind(uint32_t slot) const
-	{
-		glBindTextureUnit(slot, m_TextureID);
+		glDeleteTextures(1, &TextureID);
 	}
 
 	void TextureLibrary::Init()

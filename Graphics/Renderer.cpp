@@ -19,6 +19,7 @@ namespace Graphics
 		GLuint VertexArray;
 
 		const Shader* ActiveShader = nullptr;
+		const Texture2D* ActiveTexture = nullptr;
 	};
 
 	static RendererData s_Data;
@@ -67,7 +68,32 @@ namespace Graphics
 			filterPass->Bind();
 		}
 
-		texture->Bind(0);
+		if (!s_Data.ActiveTexture || (s_Data.ActiveTexture != texture))
+		{
+			s_Data.ActiveTexture = texture;
+			glBindTextureUnit(0, texture->TextureID);
+
+			if (s_Data.RenderTarget.Width != texture->Width && s_Data.RenderTarget.Height != texture->Height)
+			{
+				s_Data.RenderTarget.Width = texture->Width;
+				s_Data.RenderTarget.Height = texture->Height;
+
+				glDeleteFramebuffers(1, &s_Data.RenderTarget.RendererID);
+				glDeleteTextures(1, &s_Data.RenderTarget.ColorAttachment);
+
+				glCreateTextures(GL_TEXTURE_2D, 1, &s_Data.RenderTarget.ColorAttachment);
+				glTextureParameteri(s_Data.RenderTarget.ColorAttachment, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+				glTextureParameteri(s_Data.RenderTarget.ColorAttachment, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				glTextureStorage2D(s_Data.RenderTarget.ColorAttachment, 1, GL_RGBA8, s_Data.RenderTarget.Width, s_Data.RenderTarget.Height);
+
+				glCreateFramebuffers(1, &s_Data.RenderTarget.RendererID);
+				glNamedFramebufferTexture(s_Data.RenderTarget.RendererID, GL_COLOR_ATTACHMENT0, s_Data.RenderTarget.ColorAttachment, 0);
+
+				LOG_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer does not meet the requirements!");
+
+				Core::Log::Trace("Framebuffer Resized to : {0}, {1}", texture->Width, texture->Height);
+			}
+		}
 
 		struct DrawArraysIndirectCommand
 		{
@@ -87,29 +113,5 @@ namespace Graphics
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		return s_Data.RenderTarget.ColorAttachment;
-	}
-
-	void Renderer::ResizeTextureFramebuffer(uint32_t width, uint32_t height)
-	{
-		if (s_Data.RenderTarget.Width != width && s_Data.RenderTarget.Height != height)
-		{
-			s_Data.RenderTarget.Width = width;
-			s_Data.RenderTarget.Height = height;
-
-			glDeleteFramebuffers(1, &s_Data.RenderTarget.RendererID);
-			glDeleteTextures(1, &s_Data.RenderTarget.ColorAttachment);
-
-			glCreateTextures(GL_TEXTURE_2D, 1, &s_Data.RenderTarget.ColorAttachment);
-			glTextureParameteri(s_Data.RenderTarget.ColorAttachment, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTextureParameteri(s_Data.RenderTarget.ColorAttachment, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTextureStorage2D(s_Data.RenderTarget.ColorAttachment, 1, GL_RGBA8, s_Data.RenderTarget.Width, s_Data.RenderTarget.Height);
-
-			glCreateFramebuffers(1, &s_Data.RenderTarget.RendererID);
-			glNamedFramebufferTexture(s_Data.RenderTarget.RendererID, GL_COLOR_ATTACHMENT0, s_Data.RenderTarget.ColorAttachment, 0);
-
-			LOG_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer does not meet the requirements!");
-
-			Core::Log::Trace("Framebuffer Resized to : {0}, {1}", width, height);
-		}
 	}
 }

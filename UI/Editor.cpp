@@ -99,7 +99,7 @@ namespace PEditor
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 			ImGui::Begin("Image", &dockspaceOpen, ImGuiWindowFlags_NoBackground);
 			ImVec2 viewportSize = ImGui::GetContentRegionAvail();
-			ImGui::Image(reinterpret_cast<void*>(s_Data.Texture->operator GLuint()), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+			ImGui::Image(reinterpret_cast<void*>(s_Data.Texture->TextureID), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
 			ImGui::End();
 			ImGui::PopStyleVar();
 		}
@@ -109,7 +109,6 @@ namespace PEditor
 			ImGui::Begin("Blurred", &dockspaceOpen, ImGuiWindowFlags_NoBackground);
 			ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 			ImGui::Image(reinterpret_cast<void*>(blurredImage), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
-			Graphics::Renderer::ResizeTextureFramebuffer(viewportSize.x, viewportSize.y);
 			ImGui::End();
 			ImGui::PopStyleVar();
 		}
