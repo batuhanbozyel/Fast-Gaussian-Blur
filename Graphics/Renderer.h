@@ -2,7 +2,7 @@
 
 namespace Graphics
 {
-	struct Texture2D;
+	class Texture2D;
 	class Shader;
 
 	class Renderer

@@ -20,9 +20,7 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-#ifdef _WIN32
 #include <Windows.h>
-#endif
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
