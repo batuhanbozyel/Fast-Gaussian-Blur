@@ -3,8 +3,6 @@
 
 namespace Core
 {
-	uint8_t Window::s_WindowCount = 0;
-
 	static void GLFWErrorCallback(int error, const char* description)
 	{
 		Log::Error("Window Error: {0}", description);
@@ -13,16 +11,13 @@ namespace Core
 	Window::Window(const WindowProps& props)
 		: m_Props(props)
 	{
-		if (!s_WindowCount)
-		{
-			int glfw = glfwInit();
-			LOG_ASSERT(glfw, "GLFW initialization failed!");
+		int glfw = glfwInit();
+		LOG_ASSERT(glfw, "GLFW initialization failed!");
 
 #ifdef PDEBUG
-			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
-			glfwSetErrorCallback(GLFWErrorCallback);
-		}
+		glfwSetErrorCallback(GLFWErrorCallback);
 
 		m_Window = glfwCreateWindow(m_Props.Width, m_Props.Height, m_Props.Title.c_str(), nullptr, nullptr);
 		LOG_ASSERT(m_Window, "Window creation failed!");
@@ -48,17 +43,11 @@ namespace Core
 
 			props.EventCallback(WindowCloseEvent());
 		});
-
-		s_WindowCount++;
 	}
 
 	Window::~Window()
 	{
 		glfwDestroyWindow(m_Window);
-		s_WindowCount--;
-
-		if (!s_WindowCount)
-			glfwTerminate();
 	}
 
 	void Window::OnUpdate()

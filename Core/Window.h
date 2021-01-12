@@ -21,11 +21,12 @@ namespace Core
 
 		void OnUpdate();
 		void OnWindowResize(WindowResizeEvent& e);
+
+		GLFWwindow* GetNativeWindow() const { return m_Window; }
+		const WindowProps& GetProps() const { return m_Props; }
 	private:
 		WindowProps m_Props;
 		GLFWwindow* m_Window;
 		std::unique_ptr<Graphics::Context> m_Context;
-	private:
-		static uint8_t s_WindowCount;
 	};
 }
