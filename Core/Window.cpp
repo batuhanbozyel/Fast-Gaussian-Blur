@@ -19,7 +19,14 @@ namespace Core
 #endif
 		glfwSetErrorCallback(GLFWErrorCallback);
 
+		glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 		m_Window = glfwCreateWindow(m_Props.Width, m_Props.Height, m_Props.Title.c_str(), nullptr, nullptr);
+
+		int width, height;
+		glfwGetWindowSize(m_Window, &width, &height);
+		m_Props.Width = width;
+		m_Props.Height = height;
+
 		LOG_ASSERT(m_Window, "Window creation failed!");
 		m_Context = std::make_unique<Graphics::Context>(m_Window);
 
