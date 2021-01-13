@@ -22,14 +22,11 @@ namespace PEditor
 
 	struct SceneData
 	{
-		std::shared_ptr<Graphics::Shader> GaussianBlur;
 		std::shared_ptr<Graphics::Texture2D> Texture;
 	} static s_Data;
 
 	void Editor::OnStart()
 	{
-		s_Data.GaussianBlur = Graphics::ShaderLibrary::LoadShader("GaussianBlur13x13.glsl");
-		
 		s_Data.Texture = Graphics::TextureLibrary::DefaultTexture();
 	}
 
@@ -58,8 +55,7 @@ namespace PEditor
 			}
 			ImGui::EndMenuBar();
 		}
-
-		GLuint blurredImage = Graphics::Renderer::DrawTextureFiltered(s_Data.Texture.get(), s_Data.GaussianBlur.get());
+		GLuint blurredImage = Graphics::Renderer::DrawTextureFiltered(s_Data.Texture.get());
 
 		static bool dockspaceOpen = true;
 		{
