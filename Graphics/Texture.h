@@ -9,7 +9,7 @@ namespace Graphics
 		int Width = 1, Height = 1, Channels = 1;
 
 		Texture2D();
-		Texture2D(const std::string filePath);
+		Texture2D(unsigned char* buffer, int width, int height, int channels);
 		~Texture2D();
 	};
 

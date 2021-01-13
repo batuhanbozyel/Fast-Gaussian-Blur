@@ -23,25 +23,20 @@ namespace Graphics
 		glTextureSubImage2D(TextureID, 0, 0, 0, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 	}
 
-	Texture2D::Texture2D(const std::string filePath)
+	Texture2D::Texture2D(unsigned char* buffer, int width, int height, int channels)
+		: Width(width), Height(height), Channels(channels)
 	{
-		stbi_set_flip_vertically_on_load(1);
-
 		glCreateTextures(GL_TEXTURE_2D, 1, &TextureID);
 
-		unsigned char* buffer = stbi_load(filePath.c_str(), &Width, &Height, &Channels, 4);
-		if (buffer)
-		{
-			glTextureParameteri(TextureID, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTextureParameteri(TextureID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTextureParameteri(TextureID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTextureParameteri(TextureID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-			glTextureParameteri(TextureID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTextureParameteri(TextureID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(TextureID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTextureParameteri(TextureID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-			glTextureStorage2D(TextureID, 1, GL_RGBA8, Width, Height);
-			glTextureSubImage2D(TextureID, 0, 0, 0, Width, Height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-		}
-		stbi_image_free(buffer);
+		glTextureStorage2D(TextureID, 1, GL_RGBA8, Width, Height);
+		glTextureSubImage2D(TextureID, 0, 0, 0, Width, Height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+		
 	}
 	
 	Texture2D::~Texture2D()
@@ -60,16 +55,28 @@ namespace Graphics
 
 	const std::shared_ptr<Texture2D>& TextureLibrary::LoadTexture(const std::string filePath)
 	{
-		const auto& textureCacheIt = s_Instance->m_TextureCache.find(filePath);
+		stbi_set_flip_vertically_on_load(1);
+		int width, height, channels;
+		unsigned char* buffer = stbi_load(filePath.c_str(), &width, &height, &channels, 4);
 
-		if (textureCacheIt != s_Instance->m_TextureCache.end())
-			return textureCacheIt->second;
+		if (buffer)
+		{
+			const auto& textureCacheIt = s_Instance->m_TextureCache.find(filePath);
 
-		const auto& insertedTextureIt = s_Instance->m_TextureCache.insert(
-			textureCacheIt,
-			std::make_pair(filePath, std::make_shared<Texture2D>(filePath))
-		);
+			if (textureCacheIt != s_Instance->m_TextureCache.end())
+				return textureCacheIt->second;
 
-		return insertedTextureIt->second;
+			const auto& insertedTextureIt = s_Instance->m_TextureCache.insert(
+				textureCacheIt,
+				std::make_pair(filePath, std::make_shared<Texture2D>(buffer, width, height, channels))
+			);
+			stbi_image_free(buffer);
+			return insertedTextureIt->second;
+		}
+		else
+		{
+			stbi_image_free(buffer);
+			return DefaultTexture();
+		}
 	}
 }
