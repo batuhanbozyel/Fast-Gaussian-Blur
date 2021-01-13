@@ -45,8 +45,8 @@ namespace Graphics
 		ShaderLibrary::Init();
 		TextureLibrary::Init();
 
-		s_Data.GaussianBlurVerticalPass = Graphics::ShaderLibrary::LoadShader("GaussianBlur13x13Vertical.glsl");
-		s_Data.GaussianBlurHorizontalPass = Graphics::ShaderLibrary::LoadShader("GaussianBlur13x13Horizontal.glsl");
+		s_Data.GaussianBlurVerticalPass = Graphics::ShaderLibrary::LoadShader("filter/GaussianBlur13x13Vertical.glsl");
+		s_Data.GaussianBlurHorizontalPass = Graphics::ShaderLibrary::LoadShader("filter/GaussianBlur13x13Horizontal.glsl");
 		
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 

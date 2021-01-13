@@ -36,7 +36,6 @@ namespace Graphics
 
 		glTextureStorage2D(TextureID, 1, GL_RGBA8, Width, Height);
 		glTextureSubImage2D(TextureID, 0, 0, 0, Width, Height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-		
 	}
 	
 	Texture2D::~Texture2D()
