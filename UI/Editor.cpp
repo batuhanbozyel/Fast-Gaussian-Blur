@@ -22,7 +22,8 @@ namespace PEditor
 
 	struct SceneData
 	{
-		std::shared_ptr<Graphics::Texture2D> Texture;
+		int FilterCount = 1;
+		std::shared_ptr<Graphics::Texture2D> Texture = nullptr;
 	} static s_Data;
 
 	void Editor::OnStart()
@@ -55,7 +56,14 @@ namespace PEditor
 			}
 			ImGui::EndMenuBar();
 		}
-		GLuint blurredImage = Graphics::Renderer::DrawTextureFiltered(s_Data.Texture.get());
+
+		ImGui::Begin("Gaussian Blur");
+		ImGui::SliderInt("Filter Amount: ", &s_Data.FilterCount, 1, 10);
+		ImGui::End();
+
+		Graphics::Renderer::BeginFilterPass(s_Data.Texture.get());
+		Graphics::Renderer::DrawTextureFiltered(s_Data.FilterCount);
+		GLuint blurredImage = Graphics::Renderer::EndFilterPass();
 
 		static bool dockspaceOpen = true;
 		{

@@ -67,22 +67,28 @@ namespace Graphics
 		glDeleteTextures(1, &s_Data.RenderTarget.HorizontalColorAttachment);
 	}
 
-	GLuint Renderer::DrawTextureFiltered(const Texture2D* texture)
+	void Renderer::BeginFilterPass(const Texture2D* texture)
 	{
 		ResizeFramebuffer(texture->Width, texture->Height);
-		
+
 		glBindFramebuffer(GL_FRAMEBUFFER, s_Data.RenderTarget.RendererID);
 		glViewport(0, 0, s_Data.RenderTarget.Width, s_Data.RenderTarget.Height);
-		
+
 		RenderTexturePass(texture->TextureID, s_Data.RenderTarget.VerticalColorAttachment, s_Data.GaussianBlurVerticalPass.get());
 		RenderTexturePass(s_Data.RenderTarget.VerticalColorAttachment, s_Data.RenderTarget.HorizontalColorAttachment, s_Data.GaussianBlurHorizontalPass.get());
+	}
 
-		for (int i = 0; i < 9; i++)
+	void Renderer::DrawTextureFiltered(uint32_t count)
+	{
+		for (int i = 1; i < count; i++)
 		{
 			RenderTexturePass(s_Data.RenderTarget.HorizontalColorAttachment, s_Data.RenderTarget.VerticalColorAttachment, s_Data.GaussianBlurVerticalPass.get());
 			RenderTexturePass(s_Data.RenderTarget.VerticalColorAttachment, s_Data.RenderTarget.HorizontalColorAttachment, s_Data.GaussianBlurHorizontalPass.get());
 		}
+	}
 
+	GLuint Renderer::EndFilterPass()
+	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		return s_Data.RenderTarget.HorizontalColorAttachment;
