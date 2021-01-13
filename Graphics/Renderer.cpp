@@ -18,6 +18,7 @@ namespace Graphics
 	{
 		Framebuffer RenderTarget;
 		GLuint VertexArray;
+		GLuint UniformBuffer;
 
 		std::shared_ptr<Graphics::Shader> GaussianBlurVerticalPass;
 		std::shared_ptr<Graphics::Shader> GaussianBlurHorizontalPass;
@@ -46,21 +47,24 @@ namespace Graphics
 
 		s_Data.GaussianBlurVerticalPass = Graphics::ShaderLibrary::LoadShader("GaussianBlur13x13Vertical.glsl");
 		s_Data.GaussianBlurHorizontalPass = Graphics::ShaderLibrary::LoadShader("GaussianBlur13x13Horizontal.glsl");
-
-		glEnable(GL_MULTISAMPLE);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
 		glCreateVertexArrays(1, &s_Data.VertexArray);
 		glBindVertexArray(s_Data.VertexArray);
-		
+
+		glm::vec2 textureSize((float)s_Data.RenderTarget.Width, (float)s_Data.RenderTarget.Height);
+		glCreateBuffers(1, &s_Data.UniformBuffer);
+		glNamedBufferStorage(s_Data.UniformBuffer, sizeof(glm::vec2), &textureSize, GL_DYNAMIC_STORAGE_BIT);
+		glBindBufferBase(GL_UNIFORM_BUFFER, 0, s_Data.UniformBuffer);
+
 		ConstructFramebuffer();
 	}
 
 	void Renderer::Shutdown()
 	{
 		glDeleteVertexArrays(1, &s_Data.VertexArray);
+		glDeleteBuffers(1, &s_Data.UniformBuffer);
 
 		glDeleteFramebuffers(1, &s_Data.RenderTarget.RendererID);
 		glDeleteTextures(1, &s_Data.RenderTarget.VerticalColorAttachment);
@@ -107,6 +111,9 @@ namespace Graphics
 	{
 		if (s_Data.RenderTarget.Width != width && s_Data.RenderTarget.Height != height)
 		{
+			glm::vec2 textureSize((float)width, (float)height);
+			glNamedBufferSubData(s_Data.UniformBuffer, 0, sizeof(glm::vec2), &textureSize);
+
 			s_Data.RenderTarget.Width = width;
 			s_Data.RenderTarget.Height = height;
 
