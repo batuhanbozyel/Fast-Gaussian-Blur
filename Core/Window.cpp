@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Window.h"
+#include <glad/glad.h>
 
 namespace Core
 {
@@ -7,7 +8,25 @@ namespace Core
 	{
 		Log::Error("Window Error: {0}", description);
 	}
-	
+
+	static void OpenGLMessageCallback(
+		unsigned int source,
+		unsigned int type,
+		unsigned int id,
+		unsigned int severity,
+		int length,
+		const char* message,
+		const void* userParam)
+	{
+		switch (severity)
+		{
+			case GL_DEBUG_SEVERITY_HIGH:			Core::Log::Critical(message); return;
+			case GL_DEBUG_SEVERITY_MEDIUM:			Core::Log::Error(message); return;
+			case GL_DEBUG_SEVERITY_LOW:				Core::Log::Warn(message); return;
+			case GL_DEBUG_SEVERITY_NOTIFICATION:	Core::Log::Trace(message); return;
+		}
+	}
+
 	Window::Window(const WindowProps& props)
 		: m_Props(props)
 	{
@@ -28,7 +47,22 @@ namespace Core
 		m_Props.Height = height;
 
 		LOG_ASSERT(m_Window, "Window creation failed!");
-		m_Context = std::make_unique<Graphics::Context>(m_Window);
+		glfwMakeContextCurrent(m_Window);
+
+		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+		LOG_ASSERT(status, "Glad initialization failed!");
+
+#ifdef PDEBUG
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		glDebugMessageCallback(OpenGLMessageCallback, nullptr);
+		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
+#endif
+
+		LOG_ASSERT(GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 5), "OpenGL 4.5 is not supported by your hardware!");
+
+		Core::Log::Info(glGetString(GL_RENDERER));
+		Core::Log::Info(glGetString(GL_VERSION));
 
 		glfwSetWindowUserPointer(m_Window, &m_Props);
 		glfwSwapInterval(m_Props.VSync);

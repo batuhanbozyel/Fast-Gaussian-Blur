@@ -1,7 +1,6 @@
 #pragma once
 #include <GLFW/glfw3.h>
 #include "WindowEvent.h"
-#include "Graphics/Context.h"
 
 namespace Core
 {
@@ -27,6 +26,5 @@ namespace Core
 	private:
 		WindowProps m_Props;
 		GLFWwindow* m_Window;
-		std::unique_ptr<Graphics::Context> m_Context;
 	};
 }
