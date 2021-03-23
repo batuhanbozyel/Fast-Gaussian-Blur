@@ -1,4 +1,4 @@
-# Pixery Gaussian Blur
+# Two-Pass Gaussian Blur
 OpenGL 4.5 and Windows 10 specific high performance Gaussian Blur Filter using two pass linear sampling technique. 
 
 ![Pixery](/Sample/editor_preview.png?raw=true "Editor Preview")
