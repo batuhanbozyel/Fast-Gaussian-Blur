@@ -1,6 +1,6 @@
-workspace "Pixery-Gaussian-Blur"
+workspace "Fast-Gaussian-Blur"
 	architecture "x86_64"
-	startproject "GaussianBlurFilter"
+	startproject "FastGaussianBlurFilter"
 
 	configurations
 	{
@@ -22,7 +22,7 @@ group "Dependencies"
 	include "vendor/imgui"
 group ""
 
-project "GaussianBlurFilter"
+project "FastGaussianBlurFilter"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
@@ -33,6 +33,18 @@ project "GaussianBlurFilter"
 
 	pchheader "pch.h"
 	pchsource "src/pch.cpp"
+
+	filter "system:windows"
+		systemversion "latest"
+
+	filter "configurations:Debug"
+		defines "PDEBUG"
+		runtime "Debug"
+		symbols "on"
+
+	filter "configurations:Release"
+		runtime "Release"
+		optimize "on"
 
 	files
 	{
@@ -70,7 +82,8 @@ project "GaussianBlurFilter"
 		"%{wks.location}/vendor/Glad/include",
 		"%{wks.location}/vendor/glm",
 		"%{wks.location}/vendor/spdlog/include",
-		"%{wks.location}/vendor/imgui"
+		"%{wks.location}/vendor/imgui",
+		os.getenv("VULKAN_SDK") .. "/Include"
 	}
 
 	links
@@ -78,17 +91,6 @@ project "GaussianBlurFilter"
 		"GLFW",
 		"Glad",
 		"opengl32.lib",
-		"ImGui"
+		"ImGui",
+		os.getenv("VULKAN_SDK") .."/Lib/vulkan-1.lib"
 	}
-
-	filter "system:windows"
-		systemversion "latest"
-
-	filter "configurations:Debug"
-		defines "PDEBUG"
-		runtime "Debug"
-		symbols "on"
-
-	filter "configurations:Release"
-		runtime "Release"
-		optimize "on"
